@@ -26,5 +26,5 @@ To make a pAE heatmap with the minimum pAE, run the following command
 python AlphaTools.py --input $INPUT_DIR --mode "pae" --combine "min"
 
 
-# pLDDT map
+# pLDDT plot
 
