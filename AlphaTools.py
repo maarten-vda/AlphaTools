@@ -897,8 +897,6 @@ if __name__ == "__main__":
     elif not args.backend and args.output:
         parser.error("--output can only be used with --backend mode.")
 
-    print(get_complex_data("Q5TBB1"))
-
     if args.mode == "pae_value":
         value = get_value_from_file(args.input, args.x, args.y)
         print(f"The value at element {args.x},{args.y} is: {value}")
