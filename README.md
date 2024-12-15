@@ -35,3 +35,10 @@ To make a pLDDT plot of all 5 models, run the command
 The --combine flag also works with pLDDT mode. For example the following command makes a pLDDT plot of the highest scores across models  
 `python AlphaTools.py --input $INPUT_DIR --mode "plddt" --combine "max"`  
 
+
+# Delta pAE  
+
+This script can calculate the difference between the pAE heatmaps of two folds. This can be used to predict what the effect of missense mutations are on protein stability/binding.  
+`python AlphaTools.py --input $INPUT_DIR --input2 $INPUT2_DIR --mode "delta_pae"`  
+In this mode the --input2 is subtracted from --input1. `delta_pae` mode also supports the --combine flag.  
+`python AlphaTools.py --input $INPUT_DIR --input2 $INPUT2_DIR --mode "delta_pae --combine "mean""`  
