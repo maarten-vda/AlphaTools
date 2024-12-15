@@ -43,7 +43,7 @@ To make a pLDDT plot of all 5 models, run the command
 python AlphaTools.py --input $INPUT_DIR --mode "plddt"
 ```  
 
-The --combine flag also works with pLDDT mode. For example the following command makes a pLDDT plot of the highest scores across models  
+The --combine flag also works with pLDDT mode. For example the following command makes a pLDDT plot of the highest scores across models. In addition to the pAE `--combine` options `choices=['mean', 'range', 'max', 'min', 'median', 'std_dev']`, pLDDT also supports `'all'`, where all the pLDDT of all 5 models are plotted. The default `--combine` option in pLDDT mode is `'all'`.  
 ```
 python AlphaTools.py --input $INPUT_DIR --mode "plddt" --combine "max"
 ```  
