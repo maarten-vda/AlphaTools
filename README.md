@@ -26,8 +26,8 @@ The script expects five models per fold folded with AlphaFold3. The input direct
 
 ```
 python AlphaTools.py --input $INPUT_DIR --mode "pae"
-```   
-This opens an interactive pAE heatmap in the default web browser, highlight areas to zoom in and double click to zoom out. This pAE heatmap is the mean pAE across the five folds, but this can be changed with the --combine flag.  
+```
+This opens an interactive pAE heatmap in the default web browser, highlight areas to zoom in and double click to zoom out. This pAE heatmap is the mean pAE across the five folds, but this can be changed with the --combine flag. `$INPUT_DIR` is the path to the fold output.  
 The --combine flag has `choices=['mean', 'range', 'max', 'min', 'median', 'std_dev']`, and the default value is 'mean'.  
 
 To make a pAE heatmap with the minimum pAE across models, run the following command, and replace min with any other combine flag choices  
