@@ -454,7 +454,7 @@ def extract_and_average(confidence_value):
     return confidence_value  # In case no numbers are found, keep the original value
 
 
-def get_complex_data(uniprot_id):
+def get_complex_partners(uniprot_id):
 
     intact_filepath = "~/Desktop/human_complex_portal.tsv"
     # Specify the columns to load
@@ -592,6 +592,7 @@ def delta_pae(input_dir, input_dir2, combination_method):
     # Get cumulative boundaries
     boundaries = get_chain_boundaries(filepaths[0])
     name1 = filepaths[0].rsplit('/', 2)[-2].split('full_data')[0].strip('/')
+    name2 = filepaths2[0].rsplit('/', 2)[-2].split('full_data')[0].strip('/')
 
     # Calculate cumulative boundaries
     cumulative_boundaries = {}
@@ -633,7 +634,7 @@ def delta_pae(input_dir, input_dir2, combination_method):
                       line=dict(color="black", width=2))
 
     fig.update_layout(
-        title="Predicted Aligned Error (PAE) Heatmap for " + name1 + f" ({combination_method} of 5 models)",
+        title="Predicted Aligned Error (PAE) Heatmap for " + name1 + " - " + name2 + f" ({combination_method} of 5 models)",
         xaxis=dict(
             title="Residue 2",
             tickmode="array",  # Set tick mode to "array"
@@ -764,22 +765,25 @@ def plddt_per_residue(input_dir, combination_method):
             prev_atom_count = 0
             #Divide the summed PLDDT scores by the number of atoms in each residue
             for residue_id, atom_count in residue_atoms_dict.items():
-                if combination_method == 'mean':
-                    residue_plddt_score = sum(plddt_scores[prev_atom_count:prev_atom_count + atom_count]) / atom_count
-                elif combination_method == 'max':
-                    residue_plddt_score = max(plddt_scores[prev_atom_count:prev_atom_count + atom_count])
-                elif combination_method == 'min':
-                    residue_plddt_score = min(plddt_scores[prev_atom_count:prev_atom_count + atom_count])
-                elif combination_method == 'median':
-                    residue_plddt_score = np.median(plddt_scores[prev_atom_count:prev_atom_count + atom_count])
-                elif combination_method == 'std_dev':
-                    residue_plddt_score = np.std(plddt_scores[prev_atom_count:prev_atom_count + atom_count])
-                elif combination_method == 'range':
-                    residue_plddt_score = max(plddt_scores[prev_atom_count:prev_atom_count + atom_count]) - min(plddt_scores[prev_atom_count:prev_atom_count + atom_count])
+                residue_plddt_score = max(plddt_scores[prev_atom_count:prev_atom_count + atom_count])
                 per_residue_plddt_scores.append(residue_plddt_score)
                 prev_atom_count += atom_count
             all_plddt_scores.append(per_residue_plddt_scores)
 
+    if combination_method == 'mean':
+        all_plddt_scores = [np.mean(all_plddt_scores, axis=0).tolist()]
+    elif combination_method == 'max':
+        all_plddt_scores = [np.max(all_plddt_scores, axis=0).tolist()]
+    elif combination_method == 'min':
+        all_plddt_scores = [np.min(all_plddt_scores, axis=0).tolist()]
+    elif combination_method == 'median':
+        all_plddt_scores = [np.median(all_plddt_scores, axis=0).tolist()]
+    elif combination_method == 'std_dev':
+        all_plddt_scores = [np.std(all_plddt_scores, axis=0).tolist()]
+    elif combination_method == 'range':
+        all_plddt_scores = [(np.max(all_plddt_scores, axis=0) - np.min(all_plddt_scores, axis=0)).tolist()]
+    elif combination_method == 'all':
+        ()
     # Get cumulative boundaries
     boundaries = get_chain_boundaries(filepaths[0])
 
@@ -881,7 +885,7 @@ if __name__ == "__main__":
     parser.add_argument('--input2', type=str, help="Second input directory filepath or JSON file", required=False)
     parser.add_argument('--x', type=int, help="X-coordinate to retrieve value from", required=False)
     parser.add_argument('--y', type=int, help="Y-coordinate to retrieve value from", required=False)
-    parser.add_argument('--combine', type=str, help="Way to combine two files", required=False, default='mean', choices=['mean', 'range', 'max', 'min', 'median', 'std_dev'])
+    parser.add_argument('--combine', type=str, help="Way to combine two files", required=False, choices=['mean', 'range', 'max', 'min', 'median', 'std_dev', 'all'])
     parser.add_argument('--fasta', type=str, help="Fasta file to convert to AlphaFold3 input JSON format", required=False)
 
     # Parse arguments and translate selection strings
@@ -891,11 +895,24 @@ if __name__ == "__main__":
         for i in range(len(paired_inputs)):
             paired_inputs[i] = (paired_inputs[i][0], translate_selection_string(paired_inputs[i][1]))
 
+    # Dynamically set default for 'combine' based on 'mode'
+    if args.combine is None:  # Only set if the user has not specified a value
+        if args.mode == 'pae':
+            args.combine = 'mean'
+        if args.mode == 'delta_pae':
+            args.combine = 'mean'
+        elif args.mode == 'plddt':
+            args.combine = 'all'
+
     # Conditional logic to enforce --output only if --backend is selected
     if args.backend and not args.output:
         parser.error("--output is required when --backend is specified.")
     elif not args.backend and args.output:
         parser.error("--output can only be used with --backend mode.")
+    # Validation for mode and combine
+    if args.mode == 'pae' and args.combine == 'all':
+        parser.error("The 'all' option is not supported for the 'pae' mode.")
+
 
     if args.mode == "pae_value":
         value = get_value_from_file(args.input, args.x, args.y)
@@ -911,4 +928,4 @@ if __name__ == "__main__":
     if args.mode == "make_input_json":
         fasta_to_af3_json_input(args.fasta, args.output)
     if args.mode == "get_interactors":
-        get_complex_data(args.input)
+        get_complex_partners(args.input)
