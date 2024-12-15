@@ -13,7 +13,7 @@ I've only tested it with one conda 4.14.0 environment running these versions
 `biopython == 1.81`  
 `requests == 2.29.0`  
 
-The script expects five models per fold folded with AlphaFold3. 
+The script expects five models per fold folded with AlphaFold3. The input directory should be the unzipped output of an AlphaFold3 fold.  
 
 ## Running AlphaTools
 
