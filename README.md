@@ -60,5 +60,5 @@ python AlphaTools.py --input $INPUT_DIR --input2 $INPUT2_DIR --mode "delta_pae"
 
 In this mode the --input2 is subtracted from --input1. `delta_pae` mode also supports the --combine flag.  
 ```
-python AlphaTools.py --input $INPUT_DIR --input2 $INPUT2_DIR --mode "delta_pae --combine "mean""
+python AlphaTools.py --input $INPUT_DIR --input2 $INPUT2_DIR --mode "delta_pae --combine "mean"
 ```  
